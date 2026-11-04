@@ -1,0 +1,22 @@
+name: check
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: EdiabasLib (upstream, unmodified)
+        run: git clone --depth 1 https://github.com/uholeschak/ediabaslib.git
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Offline checks
+        run: DOTNET="$(which dotnet)" ./tools/check.sh 2>&1 | tee check.log
+      - name: Require zero failures
+        run: |
+          grep -q "failed checks: 0" check.log
+          grep -q "refusal tests: .* failed: 0" check.log

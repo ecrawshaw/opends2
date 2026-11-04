@@ -1,0 +1,33 @@
+# BMW's files: users' own copies. Never commit or publish them.
+/ecu-src/
+/Ecu/
+/ncs-daten*/
+/DATEN/
+*.prg
+*.grp
+/downloads/
+# Read-outs, backups and files sent back by people (VINs, vehicle data)
+/uploads/
+/share/
+readout-*/
+*.trc
+
+# Upstream EdiabasLib: cloned next to the code (see README), not vendored
+/ediabaslib
+
+# Personal agent notes
+CLAUDE.local.md
+
+# Build output
+/dist/
+/Engine/bin/
+/Engine/obj/
+.build/
+.swiftpm/
+/adapter-esp32/.pio/
+/KLineiOS/*.xcodeproj/
+DerivedData/
+
+# macOS
+.DS_Store
+._*

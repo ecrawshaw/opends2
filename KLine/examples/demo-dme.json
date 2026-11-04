@@ -1,0 +1,9 @@
+{ "id": "demo_dme", "name": "Demo engine (fake data, for kline fake-adapter)", "protocol": "ds2", "address": 18,
+  "ident": { "request": "00", "fields": [ { "id": "part", "label": "Part number", "offset": 1, "length": 7, "type": "ascii" } ] },
+  "values": [ { "request": "0B 03", "fields": [
+     { "id": "rpm", "label": "Engine speed", "offset": 1, "length": 2, "type": "u16be", "unit": "rpm" },
+     { "id": "clt", "label": "Coolant temperature", "offset": 3, "length": 1, "type": "u8", "scale": 0.75, "add": -48, "unit": "°C" },
+     { "id": "clutch", "label": "Clutch pressed", "offset": 4, "length": 1, "type": "bit", "bit": 2, "map": { "0": "No", "1": "Yes" } } ] } ],
+  "faults": { "request": "04 01", "countOffset": 1, "firstRecord": 2, "recordLength": 3, "codeOffset": 0, "codeLength": 2,
+              "texts": { "002A": "Demo fault A", "0051": "Demo fault B" } }
+}

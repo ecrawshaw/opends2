@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Mac build of EdiabasLib (GPLv3, github.com/uholeschak/ediabaslib) plus the OpenDS2 engine.
+       Upstream only targets Windows/Android, so we compile its sources here and leave out the
+       Windows-only Bluetooth and FTDI D2XX code; the K+DCAN cable is used as a plain serial port. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <NoWarn>$(NoWarn);CS0162;CS0168;CS0169;CS0219;CS0414;CS0618;CS0649;CA1416;SYSLIB0014;SYSLIB0021;SYSLIB0051</NoWarn>
+    <RootNamespace>OpenDS2</RootNamespace>
+    <AssemblyName>opends2-engine</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup>
+    <EdiabasSrc>../ediabaslib/EdiabasLib/EdiabasLib</EdiabasSrc>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(EdiabasSrc)/*.cs" Exclude="$(EdiabasSrc)/*Android.cs;$(EdiabasSrc)/BtLeGattSpp.cs;$(EdiabasSrc)/EdBluetoothInterface.cs;$(EdiabasSrc)/EdFtdiInterface.cs;$(EdiabasSrc)/Ftd2xx.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="BouncyCastle.Cryptography" Version="2.7.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <PackageReference Include="System.IO.Ports" Version="10.0.13" />
+  </ItemGroup>
+</Project>
