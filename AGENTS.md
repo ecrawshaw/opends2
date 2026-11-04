@@ -37,8 +37,9 @@ Never break these.
 1. **Reads are free. Writes are rare, narrow and gated.** Each write is its own engine command with
    its own guards: `codewrite` (E46 body module `zke5`), `dsccodewrite` (DSC MK60) and `clustervin`
    (E46 cluster VIN, experimental, see rule 4). Every write requires `expect` == a fresh read and
-   reads back afterwards. Never let the generic `job` command run a write, never add a write path
-   without review, and never weaken a guard.
+   reads back afterwards. Each one runs only on the chassis it was verified on (`Chassis.swift`).
+   Never let the generic `job` command run a write, never add a write path without review, and
+   never weaken a guard.
 2. **The engine's refusal list applies to everyone.** `DeniedReason` in `Program.cs` refuses, for every
    client including the app's own buttons, anything that writes coding through the generic job
    path, the VIN, the vehicle order, checksums, the odometer (`GWSZ_*`), service dates or power
@@ -116,6 +117,7 @@ Never break these.
 | `…/EngineViews.swift` | Module-specific screens and predicates (`isEngine`, `isDSCMK60`, `isCluster`), Dashboard/Misfires/VANOS/Tests, DSC bleed, ConfirmSheet. |
 | `…/Live.swift` | Live-value polling (`LiveMonitor`). |
 | `…/CodingWrite.swift` | Body-module and DSC coding change/restore flows (rule 6), preconditions. |
+| `…/Chassis.swift` | Detects the car's and the coding data's chassis; limits each write to the chassis it was verified on. |
 | `…/ClusterCoding.swift` | Cluster VIN (FG_NR) write: swap-only, experimental (rule 4). |
 | `…/NCSCoding.swift` | `NCSDaten`: parses NCS `.cNN` and `swtfsw/swtpsw`, decodes and encodes. Pure, builds standalone. |
 | `…/CodingEnglish.swift`, `CodingGlossary.swift` | English names for coding options and values. |
@@ -227,9 +229,11 @@ Write support exists for exactly three SGBDs, hard-coded in **both** the app and
 | DSC MK60 (`dsc_mk60`) | `isDSCMK60` (`EngineViews.swift:10`) | `DscCodeWrite` (`Program.cs:494`) |
 | E46 cluster VIN (`kombi46r`) | `ClusterCoding.swift` | `ClusterVinWrite` (`Program.cs:703`) |
 
-> ⚠️ `dsc_mk60` is the same SGBD on the E46, E85 and Mini R50. Its write is verified only on an E46.
-> The first job for multi-chassis write support is a **chassis gate**: detect the chassis (NCS
-> folder index / VIN / FA) and allow each write only on the chassis where it was verified.
+**Chassis gate (`Chassis.swift`).** On top of the SGBD checks, every write path is limited to the
+chassis it was verified on (`verifiedWriteChassis`: all three are `E46` today). The car's chassis
+comes from its instrument-cluster SGBD (`clusterChassis`: `kombi46*` → E46, `kombi85` → E85, …) and the
+coding data's chassis from `<chassis>sgfam.dat`. Coding writes need the car, the data folder and the
+verified list to agree. This matters because `dsc_mk60` is shared by the E46, E85 and Mini R50.
 
 To add a writable module:
 
@@ -240,7 +244,10 @@ To add a writable module:
 3. Add a narrow engine command with the same guards as `CodeWrite`: one SGBD, exact block size,
    `expect` == fresh read, at most N changed bytes, read-back. Add refusal tests for each guard.
 4. Add the app flow (backup, preconditions, diff, confirm, read-back, restore), modelled on
-   `requestCodingChange`, and make `request_coding_change` in `MCPTools.swift` aware of it.
+   `requestCodingChange`. Gate it with `chassisWriteBlocker`, and make `request_coding_change` in
+   `MCPTools.swift` aware of it.
+   To enable an *existing* write on a new chassis, add the chassis to `verifiedWriteChassis` (and its
+   cluster to `clusterChassis` if it's missing), only after step 5 passes on that chassis.
 5. Verify at the car with a human: one harmless option, a known byte, write, read back, restore.
    Record it in the PR.
 

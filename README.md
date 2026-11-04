@@ -104,6 +104,8 @@ S54 (MSS54) for now. Help adding other engines is welcome. See [AGENTS.md](AGENT
 - A coding change is one option at a time, on a module verified on a real car. It needs the engine
   off and the battery ≥ 12 V. The app saves a backup first, then shows you the exact byte change to
   confirm, and reads it back afterwards to check it took.
+- Coding changes only run on the chassis they were verified on (only the E46, so far). On any
+  other car the app is read-only, even if it shares a module with the E46.
 - Programming/flashing, immobilizer and key data, and the odometer are **never** touched. There is
   no odometer function in this project.
 - The **cluster VIN write** exists only to align a *swapped* instrument cluster with the car it's

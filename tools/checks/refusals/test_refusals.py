@@ -218,6 +218,23 @@ def main():
             print(f"FAIL: MCP policy: {desc}")
             failed += 1
 
+    # Chassis gate: every coding write path checks the car + data chassis before writing.
+    src = os.path.join(repo_root, "App/Sources/OpenDS2")
+    cw = open(os.path.join(src, "CodingWrite.swift"), encoding="utf-8").read()
+    cc = open(os.path.join(src, "ClusterCoding.swift"), encoding="utf-8").read()
+    ch = open(os.path.join(src, "Chassis.swift"), encoding="utf-8").read()
+    for desc, ok in [
+        ("body coding blocker checks the chassis", "chassisWriteBlocker(.bodyCoding)" in cw),
+        ("DSC coding blocker checks the chassis", "chassisWriteBlocker(.dscCoding)" in cw),
+        ("cluster VIN write + restore check the chassis", cc.count("chassisWriteBlocker(.clusterVin") == 2),
+        ("writes verified only on E46 so far", ch.count('["E46"]') == 3),
+    ]:
+        if ok:
+            passed += 1
+        else:
+            print(f"FAIL: chassis gate: {desc}")
+            failed += 1
+
     print(f"refusal tests: {passed} checks passed | failed: {failed}")
     if failed > 0:
         sys.exit(1)

@@ -619,7 +619,7 @@ struct CodingView: View {
             .padding()
             if hasNCS || hasRead || module.isCluster {
                 List {
-                    if module.isCluster {
+                    if module.sgbd.lowercased() == "kombi46r" {   // the VIN write is E46-cluster specific
                         ClusterVinSection(module: module)
                     }
                     if hasNCS { ncsContent }

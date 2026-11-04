@@ -458,7 +458,7 @@ final class AppState: ObservableObject {
     private var datenFilesCache: [String]?
 
     /// File names in the DATEN folder, listed once and cached.
-    private var datenFiles: [String] {
+    var datenFiles: [String] {
         if let c = datenFilesCache { return c }
         guard !datenPath.isEmpty else { return [] }
         let names = (try? FileManager.default.contentsOfDirectory(atPath: datenPath)) ?? []

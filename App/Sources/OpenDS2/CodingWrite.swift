@@ -41,6 +41,7 @@ extension AppState {
         guard NCSDaten.codingBasenames(module.sgbd).contains(where: Self.writableCodingFamilies.contains) else {
             return "Coding changes are only available for the body module so far."
         }
+        if let why = chassisWriteBlocker(.bodyCoding) { return why }
         guard datenReady else { return "Set the coding data folder in Setup first." }
         guard let carIndex = codingIndexFromCar(module) else { return "Read this module first, so its coding index is known." }
         guard let used = ncsIndex[module.sgbd], used == carIndex,
@@ -280,6 +281,7 @@ extension AppState {
 
     func dscCodingWriteBlocker(_ module: Module) -> String? {
         guard module.isDSCMK60 else { return "DSC coding changes are only for the ABS/DSC module." }
+        if let why = chassisWriteBlocker(.dscCoding) { return why }
         guard datenReady else { return "Set the coding data folder in Setup first." }
         guard let carIndex = codingIndexFromCar(module) else { return "Read this module first, so its coding index is known." }
         guard let used = ncsIndex[module.sgbd], used == carIndex,

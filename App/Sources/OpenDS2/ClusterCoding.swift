@@ -195,9 +195,10 @@ extension AppState {
         guard Self.vinWriteEnabled else {
             throw ClusterVinError("Cluster VIN write is off. Enable it in Setup (“Cluster VIN write”) for the documented procedure — see docs/CLUSTER-VIN-FIX.md.")
         }
-        guard module.isCluster || module.sgbd.lowercased() == "kombi46r" else {
-            throw ClusterVinError("Cluster VIN write is only available for the instrument cluster (kombi46r).")
+        guard module.sgbd.lowercased() == "kombi46r" else {
+            throw ClusterVinError("Cluster VIN write is only available for the E46 instrument cluster (kombi46r).")
         }
+        if let why = chassisWriteBlocker(.clusterVin, needsData: false) { throw ClusterVinError(why) }
         guard !busy, pending == nil else { throw ClusterVinError("Something else is running; try again when it finishes.") }
         let why = reason.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !why.isEmpty else { throw ClusterVinError("Record what this change is and why before writing.") }
@@ -305,6 +306,9 @@ extension AppState {
     func requestVinRestore(_ module: Module, _ entry: (url: URL, backup: FgNrBackup)) async {
         guard Self.vinWriteEnabled else {
             note("Cluster VIN restore refused", ok: false, "VIN writes are disabled."); return
+        }
+        if let why = chassisWriteBlocker(.clusterVin, needsData: false) {
+            note("Cluster VIN restore refused", ok: false, why); return
         }
         guard let before = AppState.hexBytes(entry.backup.beforeHex), let after = AppState.hexBytes(entry.backup.afterHex) else {
             note("Cluster VIN restore refused", ok: false, "Backup is unreadable."); return
