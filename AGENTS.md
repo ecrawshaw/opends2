@@ -139,7 +139,7 @@ Never break these.
 
 ```sh
 git clone https://github.com/uholeschak/ediabaslib.git   # next to the code; don't modify it
-./tools/check.sh      # app + engine compile, encoder test, refusal + MCP-policy tests → must end "failed: 0"
+NCS_DATEN=/path/to/DATEN/E46 ./tools/check.sh   # compile, encoder test (skipped without NCS_DATEN), refusal + policy tests → "failed: 0"
 ./build-app.sh        # → dist/OpenDS2.app, dist/OpenDS2.zip, dist/version.json
 ```
 

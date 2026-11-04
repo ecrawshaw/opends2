@@ -14,6 +14,8 @@ echo "2/4 Engine compiles…"
 
 echo "3/4 Coding encoder: every body-module option x every value, against real E46 body-module bytes…"
 swiftc -O -o "$OUT/encoder" "$SRC/NCSCoding.swift" tools/checks/encoder/main.swift 2>&1 | grep -v "^$" || true
+# The encoder test needs BMW's NCS files (never in the repo). Point NCS_DATEN at an E46 DATEN folder;
+# CLAUDE.local.md says where the maintainer's copy is. Without it, the test reports SKIPPED.
 "$OUT/encoder" | tail -5
 
 echo "4/4 Engine refusal and gating tests…"

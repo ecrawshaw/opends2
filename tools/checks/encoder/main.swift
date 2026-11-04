@@ -1,5 +1,9 @@
 import Foundation
-let d = URL(fileURLWithPath: NSString(string: "~/Projects/e46diag/ncs-daten").expandingTildeInPath)
+// Needs an E46 NCS DATEN folder (BMW's files, never in the repo): NCS_DATEN=/path/to/DATEN/E46
+guard let datenPath = ProcessInfo.processInfo.environment["NCS_DATEN"], !datenPath.isEmpty else {
+    print("SKIPPED: set NCS_DATEN to an E46 NCS DATEN folder to run the encoder test"); exit(0)
+}
+let d = URL(fileURLWithPath: NSString(string: datenPath).expandingTildeInPath)
 func t(_ f: String) -> [UInt16: String] { NCSDaten.keywordMap([UInt8](try! Data(contentsOf: d.appendingPathComponent(f)))) }
 func hx(_ s: String) -> [UInt8] { s.split(separator: " ").map { UInt8($0, radix: 16)! } }
 let blocks: [Int: [UInt8]] = [
